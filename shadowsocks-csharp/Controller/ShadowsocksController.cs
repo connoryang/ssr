@@ -240,6 +240,24 @@ namespace Shadowsocks.Controller
             }
         }
 
+        public void ClearClawedServerExcept(string group)
+        {
+            if (string.IsNullOrEmpty(group))
+            {
+                return;
+            }
+            for (int i = 0; i < _config.configs.Count; i++)
+            {
+                var cfg = _config.configs[i];
+                if (cfg.group.Contains("clawer") && cfg.group != group)
+                {
+                    _config.configs.Remove(cfg);
+                    i--;
+                }
+            }
+            SaveConfig(_config);
+        }
+
         private void RemoveExist(Server svr)
         {
             if (_config == null || _config.configs == null)

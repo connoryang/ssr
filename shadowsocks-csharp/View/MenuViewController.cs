@@ -15,6 +15,7 @@ using ZXing.Common;
 using ZXing.QrCode;
 using System.Threading;
 using System.Text.RegularExpressions;
+using Shadowsocks.Clawer;
 
 namespace Shadowsocks.View
 {
@@ -264,6 +265,7 @@ namespace Shadowsocks.View
                 new MenuItem("-"),
                 CreateMenuItem("Scan QRCode from screen...", new EventHandler(this.ScanQRCodeItem_Click)),
                 CreateMenuItem("Import SSR links from clipboard...", new EventHandler(this.CopyAddress_Click)),
+                CreateMenuItem("Reclaw", new EventHandler(this.Reclaw_Click)),
                 new MenuItem("-"),
                 CreateMenuGroup("Help", new MenuItem[] {
                     CreateMenuItem("Check update", new EventHandler(this.CheckUpdate_Click)),
@@ -1375,6 +1377,18 @@ namespace Shadowsocks.View
         private void ScanQRCodeItem_Click(object sender, EventArgs e)
         {
             ScanScreenQRCode(false);
+        }
+
+        private void Reclaw()
+        {
+            var fetchTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var cl = new SS8Clawer(controller);
+            cl.Fetch(fetchTime);
+            controller.ClearClawedServerExcept("clawer"+fetchTime);
+        }
+        private void Reclaw_Click(object sender, EventArgs e)
+        {
+            Reclaw();
         }
 
         void splash_FormClosed(object sender, FormClosedEventArgs e)

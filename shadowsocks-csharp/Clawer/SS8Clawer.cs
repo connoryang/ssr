@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
@@ -16,6 +17,8 @@ namespace Shadowsocks.Clawer
         protected ShadowsocksController controller;
         protected static string DownloadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp\\qrcode");
         private string[] QrUrls = new string[] { "https://en.ss8.fun/images/server02.png", "https://en.ss8.fun/images/server03.png" };
+        protected static string ConfigServerGroupName = "clawer";
+        protected string FetchTime;
 
         public SS8Clawer(ShadowsocksController controller)
         {
@@ -26,11 +29,20 @@ namespace Shadowsocks.Clawer
             }
         }
 
-        public void Fetch()
+        public void Fetch(string fetchTime = null)
         {
-            foreach (var url in QrUrls)
+            try
             {
-                ProcessUrl(url);
+                FetchTime = string.IsNullOrEmpty(fetchTime) ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : fetchTime;
+
+                foreach (var url in QrUrls)
+                {
+                    ProcessUrl(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex);
             }
         }
 
@@ -63,7 +75,7 @@ namespace Shadowsocks.Clawer
 
         protected void AddServer(string url)
         {
-            var success = controller.AddServerBySSURL(url);
+            var success = controller.AddServerBySSURL(url, ConfigServerGroupName + FetchTime);
         }
     }
 }
